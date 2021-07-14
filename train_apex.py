@@ -15,8 +15,8 @@ import torch.distributed as dist
 
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-# from apex import amp
-# from apex.parallel import DistributedDataParallel as DDP
+from apex import amp
+from apex.parallel import DistributedDataParallel as DDP
 
 from models.modeling import VisionTransformer, CONFIGS
 from utils.scheduler import WarmupLinearSchedule, WarmupCosineSchedule
@@ -43,17 +43,14 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-
 def simple_accuracy(preds, labels):
     return (preds == labels).mean()
-
 
 def reduce_mean(tensor, nprocs):
     rt = tensor.clone()
     dist.all_reduce(rt, op=dist.ReduceOp.SUM)
     rt /= nprocs
     return rt
-
 
 def save_model(args, model):
     model_to_save = model.module if hasattr(model, 'module') else model
@@ -69,7 +66,6 @@ def save_model(args, model):
         }
     torch.save(checkpoint, model_checkpoint)
     logger.info("Saved model checkpoint to [DIR: %s]", args.output_dir)
-
 
 def setup(args):
     # Prepare model
@@ -102,11 +98,9 @@ def setup(args):
     logger.info("Total Parameter: \t%2.1fM" % num_params)
     return args, model
 
-
 def count_parameters(model):
     params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     return params/1000000
-
 
 def set_seed(args):
     random.seed(args.seed)
@@ -114,7 +108,6 @@ def set_seed(args):
     torch.manual_seed(args.seed)
     if args.n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
-
 
 def valid(args, model, writer, test_loader, global_step):
     # Validation!
@@ -172,7 +165,6 @@ def valid(args, model, writer, test_loader, global_step):
         writer.add_scalar("test/accuracy", scalar_value=val_accuracy, global_step=global_step)
         
     return val_accuracy
-
 
 def train(args, model):
     """ Train the model """
@@ -302,7 +294,6 @@ def train(args, model):
     end_time = time.time()
     logger.info("Total Training Time: \t%f" % ((end_time - start_time) / 3600))
 
-
 def main():
     parser = argparse.ArgumentParser()
     # Required parameters
@@ -400,7 +391,6 @@ def main():
     args, model = setup(args)
     # Training
     train(args, model)
-
 
 if __name__ == "__main__":
     main()
