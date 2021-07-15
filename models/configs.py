@@ -15,6 +15,7 @@ def get_testing():
     config.representation_size = None
     return config
 
+
 def get_b16_config():
     """Returns the ViT-B/16 configuration."""
     config = ml_collections.ConfigDict()

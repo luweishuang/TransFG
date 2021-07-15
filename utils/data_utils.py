@@ -28,7 +28,7 @@ def get_loader(args):
                                     transforms.ToTensor(),
                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
         trainset = CUB(root=args.data_root, is_train=True, transform=train_transform)
-        testset = CUB(root=args.data_root, is_train=False, transform = test_transform)
+        testset = CUB(root=args.data_root, is_train=False, transform=test_transform)
     elif args.dataset == 'car':
         trainset = CarsDataset(os.path.join(args.data_root,'devkit/cars_train_annos.mat'),
                             os.path.join(args.data_root,'cars_train'),

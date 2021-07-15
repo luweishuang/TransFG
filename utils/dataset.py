@@ -71,8 +71,8 @@ class CUB():
         else:
             return len(self.test_label)
 
-class CarsDataset(Dataset):
 
+class CarsDataset(Dataset):
     def __init__(self, mat_anno, data_dir, car_names, cleaned=None, transform=None):
         """
         Args:
@@ -132,16 +132,17 @@ class CarsDataset(Dataset):
             ax.set_title(title_str.__str__(), {'fontsize': 5})
             plt.tight_layout()
 
+
 def make_dataset(dir, image_ids, targets):
     assert(len(image_ids) == len(targets))
     images = []
     dir = os.path.expanduser(dir)
     for i in range(len(image_ids)):
-        item = (os.path.join(dir, 'data', 'images',
-                             '%s.jpg' % image_ids[i]), targets[i])
+        item = (os.path.join(dir, 'data', 'images', '%s.jpg' % image_ids[i]), targets[i])
         images.append(item)
     return images
-    
+
+
 def find_classes(classes_file):
     # read classes file, separating out image IDs and class names
     image_ids = []
@@ -157,8 +158,8 @@ def find_classes(classes_file):
     classes = np.unique(targets)
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     targets = [class_to_idx[c] for c in targets]
-
     return (image_ids, targets, classes, class_to_idx)
+
 
 class dogs(Dataset):
     """`Stanford Dogs <http://vision.stanford.edu/aditya86/ImageNetDogs/>`_ Dataset.
@@ -411,8 +412,8 @@ class dogs(Dataset):
                 counts[target_class] += 1
 
         print("%d samples spanning %d classes (avg %f per class)"%(len(self._flat_breed_images), len(counts.keys()), float(len(self._flat_breed_images))/float(len(counts.keys()))))
-
         return counts
+
 
 class NABirds(Dataset):
     """`NABirds <https://dl.allaboutbirds.org/nabirds>`_ Dataset.
@@ -471,9 +472,11 @@ class NABirds(Dataset):
             img = self.transform(img)
         return img, target
 
+
 def get_continuous_class_map(class_labels):
     label_set = set(class_labels)
     return {k: i for i, k in enumerate(label_set)}
+
 
 def load_class_names(dataset_path=''):
     names = {}
@@ -486,6 +489,7 @@ def load_class_names(dataset_path=''):
 
     return names
 
+
 def load_hierarchy(dataset_path=''):
     parents = {}
 
@@ -496,6 +500,7 @@ def load_hierarchy(dataset_path=''):
             parents[child_id] = parent_id
 
     return parents
+
 
 class INat2017(VisionDataset):
     """`iNaturalist 2017 <https://github.com/visipedia/inat_comp/blob/master/2017/README.md>`_ Dataset.
