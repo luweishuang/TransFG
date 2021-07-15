@@ -79,6 +79,10 @@ def setup(args):
         num_classes = 120
     elif args.dataset == "INat2017":
         num_classes = 5089
+    elif args.dataset == "emptyJudge5":
+        num_classes = 5
+    elif args.dataset == "emptyJudge3":
+        num_classes = 3
 
     model = VisionTransformer(config, args.img_size, zero_head=True, num_classes=num_classes, smoothing_value=args.smoothing_value)
 
@@ -109,12 +113,11 @@ def set_seed(args):
 
 
 def valid(args, model, writer, test_loader, global_step):
-    # Validation!
     eval_losses = AverageMeter()
 
     logger.info("***** Running Validation *****")
-    logger.info("  Num steps = %d", len(test_loader))
-    logger.info("  Batch size = %d", args.eval_batch_size)
+    # logger.info("val Num steps = %d", len(test_loader))
+    # logger.info("val Batch size = %d", args.eval_batch_size)
 
     model.eval()
     all_preds, all_label = [], []
@@ -176,7 +179,8 @@ def train(args, model):
 
     # Prepare dataset
     train_loader, test_loader = get_loader(args)
-
+    logger.info("train Num steps = %d", len(train_loader))
+    logger.info("val Num steps = %d", len(test_loader))
     # Prepare optimizer and scheduler
     optimizer = torch.optim.SGD(model.parameters(),
                                 lr=args.learning_rate,
@@ -263,9 +267,10 @@ def train(args, model):
         all_preds, all_label = all_preds[0], all_label[0]
         accuracy = simple_accuracy(all_preds, all_label)
         accuracy = torch.tensor(accuracy).to(args.device)
-        dist.barrier()
-        train_accuracy = reduce_mean(accuracy, args.nprocs)
-        train_accuracy = train_accuracy.detach().cpu().numpy()
+        # dist.barrier()
+        # train_accuracy = reduce_mean(accuracy, args.nprocs)
+        # train_accuracy = train_accuracy.detach().cpu().numpy()
+        train_accuracy = accuracy.detach().cpu().numpy()
         logger.info("train accuracy so far: %f" % train_accuracy)
         losses.reset()
         if global_step % t_total == 0:
@@ -283,24 +288,20 @@ def main():
     # Required parameters
     parser.add_argument("--name", required=True,
                         help="Name of this run. Used for monitoring.")
-    parser.add_argument("--dataset", choices=["CUB_200_2011", "car", "dog", "nabirds", "INat2017"], default="CUB_200_2011",
-                        help="Which dataset.")
-    parser.add_argument('--data_root', type=str, default='/data/pfc/fineGrained')
-    parser.add_argument("--model_type", choices=["ViT-B_16", "ViT-B_32", "ViT-L_16",
-                                                 "ViT-L_32", "ViT-H_14"],
-                        default="ViT-B_16",
-                        help="Which variant to use.")
+    parser.add_argument("--dataset", choices=["CUB_200_2011", "car", "dog", "nabirds", "INat2017", "emptyJudge5"], default="CUB_200_2011", help="Which dataset.")
+    parser.add_argument('--data_root', type=str, default='/data/fineGrained')
+    parser.add_argument("--model_type", choices=["ViT-B_16", "ViT-B_32", "ViT-L_16", "ViT-L_32", "ViT-H_14"],
+                        default="ViT-B_16",help="Which variant to use.")
     parser.add_argument("--pretrained_dir", type=str, default="ckpts/ViT-B_16.npz",
                         help="Where to search for pretrained ViT models.")
     parser.add_argument("--pretrained_model", type=str, default=None,
                         help="load pretrained model")
     parser.add_argument("--output_dir", default="./output", type=str,
                         help="The output directory where checkpoints will be written.")
-    parser.add_argument("--img_size", default=448, type=int,
-                        help="Resolution size")
-    parser.add_argument("--train_batch_size", default=4, type=int,
+    parser.add_argument("--img_size", default=448, type=int, help="Resolution size")
+    parser.add_argument("--train_batch_size", default=64, type=int,
                         help="Total batch size for training.")
-    parser.add_argument("--eval_batch_size", default=8, type=int,
+    parser.add_argument("--eval_batch_size", default=16, type=int,
                         help="Total batch size for eval.")
     parser.add_argument("--eval_every", default=100, type=int,
                         help="Run prediction on validation set every so many steps."
@@ -310,7 +311,7 @@ def main():
                         help="The initial learning rate for SGD.")
     parser.add_argument("--weight_decay", default=0, type=float,
                         help="Weight deay if we apply some.")
-    parser.add_argument("--num_steps", default=10000, type=int,
+    parser.add_argument("--num_steps", default=100000, type=int,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--decay_type", choices=["cosine", "linear"], default="cosine",
                         help="How to decay the learning rate.")
@@ -335,18 +336,12 @@ def main():
                              "0 (default value): dynamic loss scaling.\n"
                              "Positive power of 2: static loss scaling value.\n")
 
-    parser.add_argument('--smoothing_value', type=float, default=0.0,
-                        help="Label smoothing value\n")
+    parser.add_argument('--smoothing_value', type=float, default=0.0, help="Label smoothing value\n")
 
-    parser.add_argument('--split', type=str, default='non-overlap',
-                        help="Split method")
-    parser.add_argument('--slide_step', type=int, default=12,
-                        help="Slide step for overlap split")
-
+    parser.add_argument('--split', type=str, default='overlap', help="Split method")   # non-overlap
+    parser.add_argument('--slide_step', type=int, default=12, help="Slide step for overlap split")
     args = parser.parse_args()
 
-    # if args.fp16 and args.smoothing_value != 0:
-    #     raise NotImplementedError("label smoothing not supported for fp16 training now")
     args.data_root = '{}/{}'.format(args.data_root, args.dataset)
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1:
@@ -355,8 +350,7 @@ def main():
     else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
-        torch.distributed.init_process_group(backend='nccl',
-                                             timeout=timedelta(minutes=60))
+        torch.distributed.init_process_group(backend='nccl', timeout=timedelta(minutes=60))
         args.n_gpu = 1
     args.device = device
     args.nprocs = torch.cuda.device_count()

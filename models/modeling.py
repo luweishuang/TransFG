@@ -361,6 +361,7 @@ class VisionTransformer(nn.Module):
                     for uname, unit in block.named_children():
                         unit.load_from(weights, n_block=bname, n_unit=uname) 
 
+
 def con_loss(features, labels):
     B, _ = features.shape
     features = F.normalize(features)
