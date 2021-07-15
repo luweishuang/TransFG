@@ -46,6 +46,7 @@ class CUB():
                              test_file_list[:data_len]]
             self.test_label = [x for i, x in zip(train_test_list, label_list) if not i][:data_len]
             self.test_imgname = [x for x in test_file_list[:data_len]]
+
     def __getitem__(self, index):
         if self.is_train:
             img, target, imgname = self.train_img[index], self.train_label[index], self.train_imgname[index]
