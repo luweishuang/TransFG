@@ -52,7 +52,7 @@ model.eval()
 test_transform = transforms.Compose([transforms.Resize((448, 448), Image.BILINEAR),
                                      transforms.ToTensor(),
                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-img = Image.open("attention_data/img.jpg")
+img = Image.open("img.jpg")
 x = test_transform(img)
 part_logits = model(x.unsqueeze(0))
 

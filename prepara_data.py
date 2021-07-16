@@ -66,30 +66,54 @@ import random
 #     index = write_images(all_dict["stack"], thnum, fw, index)
 
 # ----------- 写 image_class_labels.txt + train_test_split.txt --------------
-src_dir = "/data/fineGrained/emptyJudge4"
-src_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "stack": "3"}
-images_txt = os.path.join(src_dir, "images.txt")
-image_class_labels_txt = os.path.join(src_dir, "image_class_labels.txt")
-imgs_cnt = 0
-with open(image_class_labels_txt, "w") as fw:
-    with open(images_txt, "r") as fr:
-        for cur_l in fr:
-            imgs_cnt += 1
-            img_index, img_f = cur_l.strip().split(" ")
-            folder_name = img_f.split("/")[0]
-            if folder_name in src_dict:
-                cur_line = img_index + " " + str(int(src_dict[folder_name])+1)
-                fw.write(cur_line + "\n")
+# src_dir = "/data/fineGrained/emptyJudge4"
+# src_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "stack": "3"}
+# images_txt = os.path.join(src_dir, "images.txt")
+# image_class_labels_txt = os.path.join(src_dir, "image_class_labels.txt")
+# imgs_cnt = 0
+# with open(image_class_labels_txt, "w") as fw:
+#     with open(images_txt, "r") as fr:
+#         for cur_l in fr:
+#             imgs_cnt += 1
+#             img_index, img_f = cur_l.strip().split(" ")
+#             folder_name = img_f.split("/")[0]
+#             if folder_name in src_dict:
+#                 cur_line = img_index + " " + str(int(src_dict[folder_name])+1)
+#                 fw.write(cur_line + "\n")
+#
+# train_num = int(imgs_cnt*0.85)
+# print("train_num= ", train_num, ", imgs_cnt= ", imgs_cnt)
+# all_list = [1]*train_num + [0]*(imgs_cnt-train_num)
+# assert len(all_list) == imgs_cnt
+# random.shuffle(all_list)
+# train_test_split_txt = os.path.join(src_dir, "train_test_split.txt")
+# with open(train_test_split_txt, "w") as fw:
+#     with open(images_txt, "r") as fr:
+#         for cur_l in fr:
+#             img_index, img_f = cur_l.strip().split(" ")
+#             cur_line = img_index + " " + str(all_list[int(img_index) - 1])
+#             fw.write(cur_line + "\n")
 
-train_num = int(imgs_cnt*0.85)
-print("train_num= ", train_num, ", imgs_cnt= ", imgs_cnt)
-all_list = [1]*train_num + [0]*(imgs_cnt-train_num)
-assert len(all_list) == imgs_cnt
-random.shuffle(all_list)
-train_test_split_txt = os.path.join(src_dir, "train_test_split.txt")
-with open(train_test_split_txt, "w") as fw:
-    with open(images_txt, "r") as fr:
-        for cur_l in fr:
-            img_index, img_f = cur_l.strip().split(" ")
-            cur_line = img_index + " " + str(all_list[int(img_index) - 1])
-            fw.write(cur_line + "\n")
+# ----------- 生成标准测试集 --------------
+# src_dir = "/data/fineGrained/emptyJudge5/images"
+# src_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "fly": "3", "stack": "4"}
+# all_dict = {"noemp":[],  "yesemp":[], "hard": [],  "fly": [], "stack": []}
+# for sub, value in src_dict.items():
+#     sub_path = os.path.join(src_dir, sub)
+#     for cur_f in os.listdir(sub_path):
+#         all_dict[sub].append(cur_f)
+#
+# dst_dir = src_dir + "_test"
+# os.makedirs(dst_dir, exist_ok=True)
+# for sub, value in src_dict.items():
+#     sub_path = os.path.join(src_dir, sub)
+#     sub_path_dst = os.path.join(dst_dir, sub)
+#     os.makedirs(sub_path_dst, exist_ok=True)
+#
+#     cur_list = all_dict[sub]
+#     test_num = int(len(cur_list) * 0.05)
+#     for cur_f in random.sample(cur_list, test_num):
+#         cur_path = os.path.join(sub_path, cur_f)
+#         cur_path_dst = os.path.join(sub_path_dst, cur_f)
+#         os.system("cp %s %s" % (cur_path, cur_path_dst))
+
