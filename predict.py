@@ -13,14 +13,11 @@ from models.modeling import VisionTransformer, CONFIGS
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", choices=["CUB_200_2011", "emptyJudge5", "emptyJudge4"], default="emptyJudge5",
-                        help="Which dataset.")
     parser.add_argument("--img_size", default=448, type=int, help="Resolution size")
     parser.add_argument('--split', type=str, default='overlap', help="Split method")  # non-overlap
     parser.add_argument('--slide_step', type=int, default=12, help="Slide step for overlap split")
     parser.add_argument('--smoothing_value', type=float, default=0.0, help="Label smoothing value\n")
-    parser.add_argument("--pretrained_model", type=str, default="output/emptyjudge5_checkpoint.bin",
-                        help="load pretrained model")
+    parser.add_argument("--pretrained_model", type=str, default="output/emptyjudge5_checkpoint.bin", help="load pretrained model")
     return parser.parse_args()
 
 
@@ -43,17 +40,18 @@ class Predictor(object):
         config = CONFIGS["ViT-B_16"]
         config.split = self.args.split
         config.slide_step = self.args.slide_step
-
-        if self.args.dataset == "emptyJudge5":
+        model_name = os.path.basename(self.args.pretrained_model).replace("_checkpoint.bin", "")
+        print("use model_name: ", model_name)
+        if model_name.lower() == "emptyJudge5".lower():
             self.num_classes = 5
             self.cls_dict = {0: "noemp", 1: "yesemp", 2: "hard", 3: "fly", 4: "stack"}
-        elif self.args.dataset == "emptyJudge4":
+        elif model_name.lower() == "emptyJudge4".lower():
             self.num_classes = 4
             self.cls_dict = {0: "noemp", 1: "yesemp", 2: "hard", 3: "stack"}
-        elif self.args.dataset == "emptyJudge3":
+        elif model_name.lower() == "emptyJudge3".lower():
             self.num_classes = 3
             self.cls_dict = {0: "noemp", 1: "yesemp", 2: "hard"}
-        elif self.args.dataset == "emptyJudge2":
+        elif model_name.lower() == "emptyJudge2".lower():
             self.num_classes = 2
             self.cls_dict = {0: "noemp", 1: "yesemp"}
         self.model = VisionTransformer(config, self.args.img_size, zero_head=True, num_classes=self.num_classes, smoothing_value=self.args.smoothing_value)
@@ -89,9 +87,18 @@ if __name__ == "__main__":
     args = parse_args()
     predictor = Predictor(args)
 
+    # image_dir = "/home/pfc/code/empty_judge/ieemoo_emptyjudge/ieemoo_deploy_pcls/empty_imgs"
+    # img_list = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "test1.jpg", "test2.jpg", "test3.jpg", "test4.jpg",
+    #             "test5.jpg", "test6.jpg", "test7.jpg", "test8.jpg", "test9.jpg", "test10.jpg"]
+    # for index in range(len(img_list)):
+    #     image_file = os.path.join(image_dir, img_list[index])
+    #     cur_pred, pred_score = predictor.normal_predict(image_file)
+    #     print(img_list[index], cur_pred)
+    # exit()
+
     y_true = []
     y_pred = []
-    test_dir = "/data/pfc/fineGrained/test_imgs"
+    test_dir = "/data/pfc/fineGrained/test_5cls"
     dir_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "fly": "3", "stack": "4"}
     total = 0
     num = 0
@@ -128,10 +135,34 @@ if __name__ == "__main__":
     print(rst_f1)
 
 '''
-yesemp=145, noemp=453
+test_imgs: yesemp=145, noemp=453  大图
+
+output/emptyjudge5_checkpoint.bin
 The classification accuracy is 0.976589
 [[446   7]     1.5%
  [  7 138]]    4.8%
 0.968135799649844
+
+output/emptyjudge4_checkpoint.bin
+The classification accuracy is 0.976589
+[[450   3]    0.6%
+ [ 11 134]]   7.5%
+0.9675186616384996
+
+#--------------------------------------------------
+test_5cls: yesemp=319, noemp=925  小图
+
+output/emptyjudge5_checkpoint.bin    53ms/img
+The classification accuracy is 0.903537
+[[869  56]     6.0%
+ [ 64 255]]    20%
+0.872469116817879
+
+output/emptyjudge4_checkpoint.bin
+The classification accuracy is 0.937299
+[[885  40]     4.3%
+ [ 38 281]]    11.9%
+0.9179586038961038
+
 
 '''
