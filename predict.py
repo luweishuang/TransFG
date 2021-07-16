@@ -58,7 +58,7 @@ class Predictor(object):
             self.cls_dict = {0: "noemp", 1: "yesemp"}
         self.model = VisionTransformer(config, self.args.img_size, zero_head=True, num_classes=self.num_classes, smoothing_value=self.args.smoothing_value)
         if self.args.pretrained_model is not None:
-            if self.args.device == "cpu":
+            if not torch.cuda.is_available():
                 pretrained_model = torch.load(self.args.pretrained_model, map_location=torch.device('cpu'))['model']
                 self.model.load_state_dict(pretrained_model)
             else:
@@ -75,7 +75,7 @@ class Predictor(object):
                 "Image file failed to read: {}".format(img_path))
         else:
             x = self.test_transform(img)
-            if self.args.device == "cuda":
+            if torch.cuda.is_available():
                 x = x.cuda()
             part_logits = self.model(x.unsqueeze(0))
             probs = torch.nn.Softmax(dim=-1)(part_logits)
@@ -113,10 +113,10 @@ if __name__ == "__main__":
             y_pred.append(int(cur_pred))
             if int(label) == int(cur_pred):
                 num += 1
-            else:
-                print(cur_file, "predict: ", cur_pred, "true: ", int(label))
-                print(cur_file, "predict: ", cur_pred, "true: ", int(label), "pred_score:", pred_score)
-                os.system("cp %s %s" % (cur_img_file, error_img_dst))
+            # else:
+            #     print(cur_file, "predict: ", cur_pred, "true: ", int(label))
+            #     print(cur_file, "predict: ", cur_pred, "true: ", int(label), "pred_score:", pred_score)
+            #     os.system("cp %s %s" % (cur_img_file, error_img_dst))
     t1 = time.time()
     print('The cast of time is :%f seconds' % (t1-t0))
     rate = float(num)/total
@@ -128,5 +128,10 @@ if __name__ == "__main__":
     print(rst_f1)
 
 '''
+yesemp=145, noemp=453
+The classification accuracy is 0.976589
+[[446   7]     1.5%
+ [  7 138]]    4.8%
+0.968135799649844
 
 '''
