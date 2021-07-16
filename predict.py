@@ -28,6 +28,7 @@ class Predictor(object):
     def __init__(self, args):
         self.args = args
         self.args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("self.args.device =", self.args.device)
         self.args.nprocs = torch.cuda.device_count()
 
         self.cls_dict = {}
@@ -59,9 +60,10 @@ class Predictor(object):
         if self.args.pretrained_model is not None:
             if self.args.device == "cpu":
                 pretrained_model = torch.load(self.args.pretrained_model, map_location=torch.device('cpu'))['model']
+                self.model.load_state_dict(pretrained_model)
             else:
                 pretrained_model = torch.load(self.args.pretrained_model)['model']
-            self.model.load_state_dict(pretrained_model)
+                self.model.load_state_dict(pretrained_model)
         self.model.to(self.args.device)
         self.model.eval()
 
