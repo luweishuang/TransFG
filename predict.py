@@ -74,7 +74,7 @@ class Predictor(object):
             probs = torch.nn.Softmax(dim=-1)(part_logits)
             topN = torch.argsort(probs, dim=-1, descending=True).tolist()
             clas_ids = topN[0][0]
-            print(probs[0, topN[0][0]].item())
+            # print(probs[0, topN[0][0]].item())
             return clas_ids, probs[0, clas_ids].item()
 
 
