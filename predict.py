@@ -75,6 +75,8 @@ class Predictor(object):
                 "Image file failed to read: {}".format(img_path))
         else:
             x = self.test_transform(img)
+            if self.args.device == "cuda":
+                x = x.cuda()
             part_logits = self.model(x.unsqueeze(0))
             probs = torch.nn.Softmax(dim=-1)(part_logits)
             topN = torch.argsort(probs, dim=-1, descending=True).tolist()
