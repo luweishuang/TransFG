@@ -81,6 +81,8 @@ def setup(args):
         num_classes = 5089
     elif args.dataset == "emptyJudge5":
         num_classes = 5
+    elif args.dataset == "emptyJudge4":
+        num_classes = 4
     elif args.dataset == "emptyJudge3":
         num_classes = 3
 
@@ -288,7 +290,8 @@ def main():
     # Required parameters
     parser.add_argument("--name", required=True,
                         help="Name of this run. Used for monitoring.")
-    parser.add_argument("--dataset", choices=["CUB_200_2011", "car", "dog", "nabirds", "INat2017", "emptyJudge5"], default="CUB_200_2011", help="Which dataset.")
+    parser.add_argument("--dataset", choices=["CUB_200_2011", "car", "dog", "nabirds", "INat2017", "emptyJudge5", "emptyJudge4"],
+                        default="CUB_200_2011", help="Which dataset.")
     parser.add_argument('--data_root', type=str, default='/data/fineGrained')
     parser.add_argument("--model_type", choices=["ViT-B_16", "ViT-B_32", "ViT-L_16", "ViT-L_32", "ViT-H_14"],
                         default="ViT-B_16",help="Which variant to use.")

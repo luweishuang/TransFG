@@ -37,9 +37,9 @@ import random
 
 
 # ----------- 获取有效图片并写images.txt --------------
-# src_dir = "/data/fineGrained/emptyJudge5/images"
-# src_dict = {"yesemp":"1", "noemp":"0", "hard": "2", "fly": "3", "stack": "4"}
-# all_dict = {"yesemp":[], "noemp":[], "hard": [], "fly": [], "stack": []}
+# src_dir = "/data/fineGrained/emptyJudge4/images"
+# src_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "stack": "3"}
+# all_dict = {"yesemp":[], "noemp":[], "hard": [], "stack": []}
 # for sub, value in src_dict.items():
 #     sub_path = os.path.join(src_dir, sub)
 #     for cur_f in os.listdir(sub_path):
@@ -48,9 +48,8 @@ import random
 # yesnum = len(all_dict["yesemp"])
 # nonum = len(all_dict["noemp"])
 # hardnum = len(all_dict["hard"])
-# flynum = len(all_dict["fly"])
 # stacknum = len(all_dict["stack"])
-# thnum = min(yesnum, nonum, hardnum, flynum, stacknum)
+# thnum = min(yesnum, nonum, hardnum, stacknum)
 # images_txt = src_dir + ".txt"
 # index = 1
 #
@@ -61,15 +60,14 @@ import random
 #     return index
 #
 # with open(images_txt, "w") as fw:
-#     index = write_images(all_dict["yesemp"], thnum, fw, index)
 #     index = write_images(all_dict["noemp"], thnum, fw, index)
+#     index = write_images(all_dict["yesemp"], thnum, fw, index)
 #     index = write_images(all_dict["hard"], thnum, fw, index)
-#     index = write_images(all_dict["fly"], thnum, fw, index)
 #     index = write_images(all_dict["stack"], thnum, fw, index)
 
 # ----------- 写 image_class_labels.txt + train_test_split.txt --------------
-src_dir = "/data/fineGrained/emptyJudge5"
-src_dict = {"yesemp":"1", "noemp":"0", "hard": "2", "fly": "3", "stack": "4"}
+src_dir = "/data/fineGrained/emptyJudge4"
+src_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "stack": "3"}
 images_txt = os.path.join(src_dir, "images.txt")
 image_class_labels_txt = os.path.join(src_dir, "image_class_labels.txt")
 imgs_cnt = 0
