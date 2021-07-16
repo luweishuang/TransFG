@@ -57,7 +57,10 @@ class Predictor(object):
             self.cls_dict = {0: "noemp", 1: "yesemp"}
         self.model = VisionTransformer(config, self.args.img_size, zero_head=True, num_classes=self.num_classes, smoothing_value=self.args.smoothing_value)
         if self.args.pretrained_model is not None:
-            pretrained_model = torch.load(self.args.pretrained_model, map_location=torch.device('cpu'))['model']
+            if self.args.device == "cpu":
+                pretrained_model = torch.load(self.args.pretrained_model, map_location=torch.device('cpu'))['model']
+            else:
+                pretrained_model = torch.load(self.args.pretrained_model)['model']
             self.model.load_state_dict(pretrained_model)
         self.model.to(self.args.device)
         self.model.eval()
@@ -84,7 +87,7 @@ if __name__ == "__main__":
 
     y_true = []
     y_pred = []
-    test_dir = "/data/fineGrained/test_imgs"
+    test_dir = "/data/pfc/fineGrained/test_imgs"
     dir_dict = {"noemp":"0", "yesemp":"1", "hard": "2", "fly": "3", "stack": "4"}
     total = 0
     num = 0
