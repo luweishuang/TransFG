@@ -232,6 +232,7 @@ class Block(nn.Module):
             self.ffn_norm.weight.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "scale")]))
             self.ffn_norm.bias.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "bias")]))
 
+
 class Part_Attention(nn.Module):
     def __init__(self):
         super(Part_Attention, self).__init__()
@@ -245,6 +246,7 @@ class Part_Attention(nn.Module):
 
         _, max_inx = last_map.max(2)
         return _, max_inx
+
 
 class Encoder(nn.Module):
     def __init__(self, config):
@@ -275,6 +277,7 @@ class Encoder(nn.Module):
 
         return part_encoded
 
+
 class Transformer(nn.Module):
     def __init__(self, config, img_size):
         super(Transformer, self).__init__()
@@ -285,6 +288,7 @@ class Transformer(nn.Module):
         embedding_output = self.embeddings(input_ids)
         part_encoded = self.encoder(embedding_output)
         return part_encoded
+
 
 class VisionTransformer(nn.Module):
     def __init__(self, config, img_size=224, num_classes=21843, smoothing_value=0, zero_head=False):
@@ -374,6 +378,7 @@ def con_loss(features, labels):
     loss = (pos_cos_matrix * pos_label_matrix).sum() + (neg_cos_matrix * neg_label_matrix).sum()
     loss /= (B * B)
     return loss
+
 
 CONFIGS = {
     'ViT-B_16': configs.get_b16_config(),
