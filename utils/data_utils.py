@@ -105,8 +105,11 @@ def get_loader(args):
                                     transforms.RandomHorizontalFlip(),
                                     transforms.ToTensor(),
                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-        test_transform=transforms.Compose([transforms.Resize((600, 600), Image.BILINEAR),
-                                    transforms.CenterCrop((448, 448)),
+        # test_transform = transforms.Compose([transforms.Resize((600, 600), Image.BILINEAR),
+        #                             transforms.CenterCrop((448, 448)),
+        #                             transforms.ToTensor(),
+        #                             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+        test_transform = transforms.Compose([transforms.Resize((448, 448), Image.BILINEAR),
                                     transforms.ToTensor(),
                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
         trainset = emptyJudge(root=args.data_root, is_train=True, transform=train_transform)
